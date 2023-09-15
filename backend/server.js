@@ -1,35 +1,55 @@
 const express = require("express");
-const connectDB =  require(`./config/db`)
-const morgan = require("morgan")
+const connectDB = require(`./config/db`);
+const morgan = require("morgan");
 const userRoutes = require("../backend/routes/userRoutes");
 const chatRoutes = require("../backend/routes/chatRoutes");
 const messageRoutes = require("../backend/routes/messageRoute");
+const appwriteRoute = require("../backend/config/appwrite");
+const fileUpload = require("express-fileupload");
 const dotenv = require(`dotenv`);
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
 dotenv.config();
 connectDB();
 const app = express();
-const cors = require('cors');
+const cors = require("cors");
+const  newMessagerouter = require("./controllers/newMessageController");
+
+const corsOptions = {
+  origin: "http://localhost:3000",
+  credentials: true,
+  optionSuccessStatus: 200,
+};
+
+const approute = appwriteRoute.router;
+const nmr = newMessagerouter.router;
+
+
 app.use(morgan("tiny"));
-const corsOptions ={
-    origin:'http://localhost:3000', 
-    credentials:true,            //access-control-allow-credentials:true
-    optionSuccessStatus:200
-}
 app.use(cors(corsOptions));
-
 app.use(express.json()); // for server to accept json data
+app.use(express.urlencoded({ extended: true })); // Parse URL-encoded form data
 
-app.use("/api/v1/user",userRoutes);
-app.use("/api/v1/chat",chatRoutes);
-app.use("/api/v1/message",messageRoutes);
+app.use(
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: "/temp/",
+  })
+);
+
+app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/chat", chatRoutes);
+app.use("/api/v1/message", messageRoutes);
+app.use("/api/v1/file", approute);
+app.use("/api/v1/newMessage", nmr);
+
 app.use(notFound);
 app.use(errorHandler);
+
 const PORT = process.env.PORT || 5000;
 
-const server =  app.listen(PORT,()=>{
-    console.log(`server is running on port http://localhost:${PORT}`);
+const server = app.listen(PORT, () => {
+  console.log(`Server is running on port http://localhost:${PORT}`);
 });
 
 const io = require("socket.io")(server,{
@@ -73,3 +93,5 @@ io.on("connection",(socket)=>{
     })
 
 })
+//speakerloksabha[at]sansad[dot]nic[dot]in
+//amitshah[dot]mp[at]sansad[dot]nic[dot]in
