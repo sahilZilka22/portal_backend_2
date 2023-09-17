@@ -76,22 +76,22 @@ io.on("connection",(socket)=>{
     socket.on("stop typing",(room)=>socket.in(room).emit("stop typing"))
 
     socket.on("new message",(newMessageRecieved)=>{
-        var chat = newMessageRecieved.chat
-        
+        var chat = newMessageRecieved.chat 
         if(!chat.users) return console.log(`Chat users not defined ${chat.users}`);
         chat.users.forEach((user)=>{
             // this logic defines that if we want to send messages to all the other users in the room 
             // other than the user who sent this message
-            if(user._id == newMessageRecieved.sender._id) return;
+            if(user._id !== newMessageRecieved.sender._id) {
 
-            socket.in(user._id).emit("message recieved", newMessageRecieved);
+              socket.in(user._id).emit("message recieved", newMessageRecieved);  
+            }
         })
     });
+
     socket.off("setup",()=>{
         console.log("User disconnected");
         socket.leave(userData._id);
     })
 
 })
-//speakerloksabha[at]sansad[dot]nic[dot]in
-//amitshah[dot]mp[at]sansad[dot]nic[dot]in
+
