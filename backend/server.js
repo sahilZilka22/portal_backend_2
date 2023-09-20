@@ -37,7 +37,7 @@ app.use(
   })
 );
 
-// app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/chat", chatRoutes);
 app.use("/api/v1/message", messageRoutes);
 app.use("/api/v1/file", approute);
