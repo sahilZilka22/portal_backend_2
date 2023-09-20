@@ -43,6 +43,10 @@ app.use("/api/v1/message", messageRoutes);
 app.use("/api/v1/file", approute);
 app.use("/api/v1/newMessage", nmr);
 
+app.get("/home",(req,res)=>{
+  console.log("reached home");
+  res.send("Reached home");
+})
 app.use(notFound);
 app.use(errorHandler);
 
