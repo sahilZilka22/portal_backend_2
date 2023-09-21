@@ -18,7 +18,6 @@ const  newMessagerouter = require("./controllers/newMessageController");
 const corsOptions = {
   origin: "https://dooper-frontend.onrender.com",
   credentials: true,
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   optionSuccessStatus: 200,
 };
 
@@ -60,7 +59,7 @@ const server = app.listen(PORT, () => {
 const io = require("socket.io")(server,{
     pingTimeout :6000,
     cors : {
-        origin : `https://backend-p1wy.onrender.com`
+        origin : `https://dooper-frontend.onrender.com` // i just added frontend here (1)
     } 
 });
 
