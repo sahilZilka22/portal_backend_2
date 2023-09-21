@@ -51,12 +51,11 @@ app.get("/home",(req,res)=>{
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000; //PORT = 5001
 
 const server = app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-console.log({server : server});
 
 const io = require("socket.io")(server,{
     pingTimeout :6000,
