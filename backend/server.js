@@ -16,7 +16,7 @@ const cors = require("cors");
 const  newMessagerouter = require("./controllers/newMessageController");
 
 const corsOptions = {
-  origin: "https://backend-p1wy.onrender.com",
+  origin: "https://dooper-frontend.onrender.com",
   credentials: true,
   optionSuccessStatus: 200,
 };
