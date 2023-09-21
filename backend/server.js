@@ -59,7 +59,7 @@ const server = app.listen(PORT, () => {
 const io = require("socket.io")(server,{
     pingTimeout :6000,
     cors : {
-        origin : `https://backend-p1wy.onrender.com`// backend
+        origin : `https://dooper-frontend.onrender.com`// backend
     } 
 });
 
