@@ -1,3 +1,4 @@
+const fs = require("fs");
 const express = require("express");
 const connectDB = require(`./config/db`);
 const morgan = require("morgan");
@@ -23,6 +24,11 @@ const corsOptions = {
 
 const approute = appwriteRoute.router;
 const nmr = newMessagerouter.router;
+const tempFileDir = "./temp/";
+
+if (!fs.existsSync(tempFileDir)) {
+  fs.mkdirSync(tempFileDir);
+}
 
 
 app.use(morgan("tiny"));
@@ -33,7 +39,7 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded form data
 app.use(
   fileUpload({
     useTempFiles: true,
-    tempFileDir: "/temp/",
+    tempFileDir: tempFileDir,
   })
 );
 
