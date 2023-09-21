@@ -57,7 +57,7 @@ const server = app.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`);
 });
 
-const io = require("socket.io")(server,{
+const io = require("socket.io")("https://backend-p1wy.onrender.com",{
     pingTimeout :6000,
     cors : {
         origin : `https://dooper-frontend.onrender.com`
