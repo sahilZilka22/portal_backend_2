@@ -16,7 +16,7 @@ const cors = require("cors");
 const  newMessagerouter = require("./controllers/newMessageController");
 
 const corsOptions = {
-  origin: "https://portal-frontend-v9fc.onrender.com/",
+  origin: "https://portal-frontend-v9fc.onrender.com",
   credentials: true,
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   optionSuccessStatus: 200,
@@ -60,7 +60,7 @@ const server = app.listen(PORT, () => {
 const io = require("socket.io")(server,{
     pingTimeout :6000,
     cors : {
-        origin : `http://localhost:3000`
+        origin : `https://portal-frontend-v9fc.onrender.com`
     } 
 });
 
