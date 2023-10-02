@@ -16,8 +16,11 @@ const app = express();
 const cors = require("cors");
 const  newMessagerouter = require("./controllers/newMessageController");
 
+const frontend = "https://dooper-frontend.onrender.com"
+const localfrontend = "http://localhost:3000"
+
 const corsOptions = {
-  origin: "https://dooper-frontend.onrender.com",
+  origin: localfrontend,
   credentials: true,
   optionSuccessStatus: 200,
 };
@@ -56,7 +59,7 @@ app.get("/home",(req,res)=>{
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000; //PORT = 5001
+const PORT = process.env.PORT || 5001; //PORT = 5001
 
 const server = app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
@@ -65,7 +68,7 @@ const server = app.listen(PORT, () => {
 const io = require("socket.io")(server,{
     pingTimeout :6000,
     cors : {
-        origin : `https://dooper-frontend.onrender.com`// backend
+        origin : frontend// frontend to connect with socket
     } 
 });
 
