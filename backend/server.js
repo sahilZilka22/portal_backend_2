@@ -17,11 +17,11 @@ const app = express();
 const cors = require("cors");
 const  newMessagerouter = require("./controllers/newMessageController");
 
-const frontend = "https://dooper-frontend.onrender.com"
+const frontend = "https://dooper-portal.onrender.com";
 const localfrontend = "http://localhost:3000"
 
 const corsOptions = {
-  origin: localfrontend,
+  origin: frontend,
   credentials: true,
   optionSuccessStatus: 200,
 };
@@ -70,7 +70,7 @@ const server = app.listen(PORT, () => {
 const io = require("socket.io")(server,{
     pingTimeout :6000,
     cors : {
-        origin : localfrontend// frontend to connect with socket
+        origin : frontend// frontend to connect with socket
     } 
 });
 
