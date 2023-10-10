@@ -6,9 +6,9 @@ const dotenv = require(`dotenv`);
 const express = require("express");
 const router = express.Router();
 const usermodel = require("../models/UserModel")
+const newusermodel = require("../models/NewUserModel")
 const Chat = require("../models/chatModel");
 const { protect } = require("../middleware/authMiddleware");
-const messageModel = require("../models/messageModel");
 dotenv.config();
 
 
@@ -86,7 +86,7 @@ const sendMessages = asyncHandler(async(req,res)=>{
         var messagetoSend = await newMessageModel.create(newMessage);
         messagetoSend = await messagetoSend.populate("sender", "name email");
         messagetoSend = await messagetoSend.populate("chat", "chatName isGroupChat users latestMessage");
-        messagetoSend = await usermodel.populate(messagetoSend,{
+        messagetoSend = await newusermodel.populate(messagetoSend,{
             path : "chat.users",
             select : "name email"
         });
@@ -103,7 +103,7 @@ const sendMessages = asyncHandler(async(req,res)=>{
 const allMessages = asyncHandler(async(req,res)=>{
     try {
         const messages = await newMessageModel.find({chat : req.params.chatId})
-        .populate("sender", "name photo email")
+        .populate("sender", "name photo role")
         .populate("chat")
         res.json(messages)
     } catch (error) {

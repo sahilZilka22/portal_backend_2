@@ -3,6 +3,7 @@ const express = require("express");
 const connectDB = require(`./config/db`);
 const morgan = require("morgan");
 const userRoutes = require("../backend/routes/userRoutes");
+const newUserRoutes = require("../backend/routes/newUserRoutes");
 const chatRoutes = require("../backend/routes/chatRoutes");
 const messageRoutes = require("../backend/routes/messageRoute");
 const appwriteRoute = require("../backend/config/appwrite");
@@ -47,6 +48,7 @@ app.use(
 );
 
 app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/newuser", newUserRoutes);
 app.use("/api/v1/chat", chatRoutes);
 app.use("/api/v1/message", messageRoutes);
 app.use("/api/v1/file", approute);
@@ -68,7 +70,7 @@ const server = app.listen(PORT, () => {
 const io = require("socket.io")(server,{
     pingTimeout :6000,
     cors : {
-        origin : frontend// frontend to connect with socket
+        origin : localfrontend// frontend to connect with socket
     } 
 });
 

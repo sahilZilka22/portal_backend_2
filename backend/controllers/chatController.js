@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const Chat = require("../models/chatModel");
 const User = require("../models/UserModel");
+const NewUser = require("../models/NewUserModel");
 
 // -- CHAT MODEL --
 // chatName
@@ -22,7 +23,6 @@ const User = require("../models/UserModel");
 //@access          Protected
 const accessChat = asyncHandler(async (req, res) => {
   const { userId } = req.body;
-
   if (!userId) {
     console.log("UserId param not sent with request");
     return res.sendStatus(400);
@@ -38,9 +38,9 @@ const accessChat = asyncHandler(async (req, res) => {
     .populate("users", "-password")
     .populate("latestMessage");
 
-  isChat = await User.populate(isChat, {
+  isChat = await NewUser.populate(isChat, {
     path: "latestMessage.sender",
-    select: "name photo email",
+    select: "name photo phoneNumber",
   });
 
   if (isChat.length > 0) {
@@ -51,8 +51,6 @@ const accessChat = asyncHandler(async (req, res) => {
       isGroupChat: false,
       users: [req.user._id, userId],
     };
-    console.log(chatData);
-
     try {
       const createdChat = await Chat.create(chatData);
       const FullChat = await Chat.findOne({ _id: createdChat._id }).populate(
@@ -60,7 +58,6 @@ const accessChat = asyncHandler(async (req, res) => {
         "-password"
       );
       res.status(200).json(FullChat);
-      console.log({FullChat : FullChat});
     } catch (error) {
       res.status(400);
       throw new Error(error.message);
@@ -79,9 +76,9 @@ const fetchChats = asyncHandler(async (req, res) => {
       .populate("latestMessage","messsage")
       .sort({ updatedAt: -1 })
       .then(async (results) => {
-        results = await User.populate(results, {
+        results = await NewUser.populate(results, {
           path: "latestMessage.sender",
-          select: "name pic email",
+          select: "name pic role",
         });
         res.status(200).send(results);
       });
@@ -92,26 +89,29 @@ const fetchChats = asyncHandler(async (req, res) => {
 });
 const fetchChatsnew = asyncHandler(async (req, res) => {
   try {
-    Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
-      .populate("users", "-password -photo -createdAt -updatedAt")
-      .populate("groupAdmin", "-password")
+    // Use the $elemMatch operator to find chats where the user is a participant
+    const chats = await Chat.find({
+      users: { $elemMatch: { $eq: req.user._id } },
+    })
+      .populate("users", "-photo -createdAt -updatedAt") // Populate the 'users' field, excluding 'photo', 'createdAt', and 'updatedAt'
+      .populate("groupAdmin","phoneNumber") // Populate the 'groupAdmin' field
       .populate({
-        path : "latestMessage",
-        populate:{
-          path : "message"
-        }
-      })
-      .sort({ updatedAt: -1 })
-      .then(async (results) => {
-        results = await User.populate(results, {
-          path: "latestMessage.sender",
-          select: " email",
-        });
-        res.status(200).send(results);
-      });
+        path: "latestMessage",
+        populate: {
+          path: "message",
+        },
+      }) // Nested population for 'latestMessage' and 'message'
+      .sort({ updatedAt: -1 }); // Sort the results by 'updatedAt' in descending order
+    // Populate the 'latestMessage.sender' field with 'phoneNumber' selected
+    const populatedChats = await NewUser.populate(chats, {
+      path: "latestMessage.sender",
+      select: "phoneNumber",
+    });
+
+    res.status(200).json(populatedChats); // Send the populated chat data as JSON response
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
