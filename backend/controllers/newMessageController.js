@@ -84,11 +84,11 @@ const sendMessages = asyncHandler(async(req,res)=>{
     }
     try {
         var messagetoSend = await newMessageModel.create(newMessage);
-        messagetoSend = await messagetoSend.populate("sender", "name email");
+        messagetoSend = await messagetoSend.populate("sender", "name role");
         messagetoSend = await messagetoSend.populate("chat", "chatName isGroupChat users latestMessage");
         messagetoSend = await newusermodel.populate(messagetoSend,{
             path : "chat.users",
-            select : "name email"
+            select : "name role" 
         });
     
         await Chat.findByIdAndUpdate(req.body.chatId,{latestMessage : messagetoSend});

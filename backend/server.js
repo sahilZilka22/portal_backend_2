@@ -15,10 +15,10 @@ dotenv.config();
 connectDB();
 const app = express();
 const cors = require("cors");
-const  newMessagerouter = require("./controllers/newMessageController");
+const newMessagerouter = require("./controllers/newMessageController");
 
 const frontend = "https://dooper-portal.onrender.com";
-const localfrontend = "http://localhost:3000"
+const localfrontend = "http://localhost:3000";
 
 const corsOptions = {
   origin: frontend,
@@ -33,7 +33,6 @@ const tempFileDir = "./temp/";
 if (!fs.existsSync(tempFileDir)) {
   fs.mkdirSync(tempFileDir);
 }
-
 
 app.use(morgan("tiny"));
 app.use(cors(corsOptions));
@@ -54,10 +53,10 @@ app.use("/api/v1/message", messageRoutes);
 app.use("/api/v1/file", approute);
 app.use("/api/v1/newMessage", nmr);
 
-app.get("/home",(req,res)=>{
+app.get("/home", (req, res) => {
   console.log("reached home");
   res.send("Reached home");
-})
+});
 app.use(notFound);
 app.use(errorHandler);
 
@@ -67,47 +66,43 @@ const server = app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-const io = require("socket.io")(server,{
-    pingTimeout :6000,
-    cors : {
-        origin : frontend// frontend to connect with socket
-    } 
+const io = require("socket.io")(server, {
+  pingTimeout: 6000,
+  cors: {
+    origin: frontend, // frontend to connect with socket
+  },
 });
 
+io.on("connection", (socket) => {
+  console.log("Connected to socket.io");
+  socket.on("setup", (userData) => {
+    socket.join(userData._id);
+    socket.emit("connected");
+  });
 
-io.on("connection",(socket)=>{
-    console.log("Connected to socket.io");
-    socket.on("setup",(userData)=>{
-        socket.join(userData._id);
-        socket.emit("connected")
+  socket.on("join chat", (room) => {
+    socket.join(room);
+    console.log("User joined Room : " + room);
+  });
+
+  socket.on("typing", (room) => socket.in(room).emit("typing"));
+  socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
+
+  socket.on("new message", (newMessageRecieved) => {
+    var chat = newMessageRecieved.chat;
+    if (!chat.users) return console.log(`Chat users not defined ${chat.users}`);
+    chat.users.forEach((user) => {
+      // this logic defines that if we want to send messages to all the other users in the room
+      // other than the user who sent this message
+      if (user._id !== newMessageRecieved.sender._id) {
+        socket.in(user._id).emit("message recieved", newMessageRecieved);
+      }
     });
+  });
 
-    socket.on("join chat", (room)=>{
-        socket.join(room);
-        console.log("User joined Room : " + room);
-    });
-
-    socket.on("typing",(room)=>socket.in(room).emit("typing"))
-    socket.on("stop typing",(room)=>socket.in(room).emit("stop typing"))
-
-    socket.on("new message",(newMessageRecieved)=>{
-        var chat = newMessageRecieved.chat 
-        if(!chat.users) return console.log(`Chat users not defined ${chat.users}`);
-        chat.users.forEach((user)=>{
-            // this logic defines that if we want to send messages to all the other users in the room 
-            // other than the user who sent this message
-            if(user._id !== newMessageRecieved.sender._id) {
-
-              socket.in(user._id).emit("message recieved", newMessageRecieved);  
-            }
-        })
-    });
-
-    socket.off("setup",()=>{
-        console.log("User disconnected");
-        socket.leave(userData._id);
-    })
-
-})
+  socket.off("setup", () => {
+    console.log("User disconnected");
+    socket.leave(userData._id);
+  });
+});
 // added a comment
-
